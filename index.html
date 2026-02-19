@@ -1,142 +1,192 @@
-<!-- TapTap Vienna | TAPSY Cardano Stake Pool - Enhanced Version -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapTap Vienna | TAPSY Cardano Stake Pool</title>
+    
+    <!-- Fonts & Chart.js -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #00d4aa;
+            --accent: #00a8ff;
+            --dark: #0d1117;
+            --dark2: #161b22;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --border: rgba(255,255,255,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--dark); 
+            color: var(--text); 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* NAVBAR */
+        header {
+            position: fixed; top: 0; width: 100%; height: 70px;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%; z-index: 1000;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.2rem; }
+        .logo span { color: var(--primary); }
+        
+        nav ul { display: flex; list-style: none; gap: 20px; }
+        nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; }
+        nav a:hover { color: var(--primary); }
+
+        .burger { display: none; cursor: pointer; flex-direction: column; gap: 5px; }
+        .burger div { width: 25px; height: 3px; background: var(--text); transition: 0.3s; }
+
+        /* HERO */
+        .hero {
+            padding: 150px 5% 80px; text-align: center;
+            background: radial-gradient(circle at top, rgba(0, 212, 170, 0.15), transparent);
+        }
+        .badge {
+            display: inline-block; padding: 6px 15px; border-radius: 20px;
+            background: rgba(0, 212, 170, 0.1); color: var(--primary);
+            font-weight: 700; font-size: 0.8rem; margin-bottom: 20px;
+            border: 1px solid var(--primary);
+        }
+        h1 { font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+        h1 em { font-style: normal; color: var(--primary); }
+
+        /* LIVE STATS GRID */
+        .stats-container { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .card { 
+            background: var(--dark2); padding: 30px; border-radius: 15px; 
+            border: 1px solid var(--border); transition: 0.3s;
+        }
+        .card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .card h3 { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; margin-bottom: 10px; }
+        .card .value { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+
+        /* CHARTS */
+        .charts-section { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        .chart-card { background: var(--dark2); padding: 20px; border-radius: 15px; margin-bottom: 20px; height: 350px; }
+
+        /* MOBILE OPTIMIZATION */
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .burger { display: flex; }
+            h1 { font-size: 2.2rem; }
+        }
+
+        .loading-pulse { opacity: 0.5; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
 <header>
-  <div class="logo">TAP<span>SY</span> | TapTap Vienna</div>
-  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-  <nav id="mainNav">
-    <ul>
-      <li><a href="#hero" onclick="closeMenu()">Home</a></li>
-      <li><a href="#live-stats" onclick="closeMenu()">Live Stats</a></li>
-      <li><a href="#pool" onclick="closeMenu()">Pool ID</a></li>
-      <li><a href="#news" onclick="closeMenu()">News</a></li>
-      <li><a href="#specs" onclick="closeMenu()">Specs</a></li>
-    </ul>
-  </nav>
+    <div class="logo"><span>TAP</span>SY | TapTap Vienna</div>
+    <nav>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#stats">Stats</a></li>
+            <li><a href="https://t.me/taptapstaking">Telegram</a></li>
+        </ul>
+    </nav>
+    <div class="burger"><div></div><div></div><div></div></div>
 </header>
 
-<section class="hero" id="hero">
-  <div class="badge"><span class="dot"></span>Live on Cardano Mainnet</div>
-  <h1>It&rsquo;s a small tap for you,<br><em>one giant tap for Cardano!</em></h1>
-  <p class="subtitle">TapTap Vienna &mdash; a Cardano Stake Pool from Vienna.<br>Maximum decentralization, minimum fees.</p>
-  <div class="stats">
-    <div class="stat"><span class="v">340 ADA</span><span class="l">Fixed Fee / Epoch</span></div>
-    <div class="stat"><span class="v">1%</span><span class="l">Variable Fee</span></div>
-    <div class="stat"><span class="v">TAPSY</span><span class="l">Ticker ID</span></div>
-  </div>
-  <div class="btns">
-    <a href="https://t.me/taptapstaking" class="btn btn-g" target="_blank">Telegram News</a>
-    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-o" target="_blank">View on Pooltool.io</a>
-  </div>
+<section class="hero">
+    <div class="badge">● LIVE ON CARDANO</div>
+    <h1>It's a small tap for you,<br><em>one giant tap for Cardano!</em></h1>
+    <p style="color: var(--muted); max-width: 600px; margin: 0 auto;">TapTap Vienna — Dein Cardano Stake Pool aus Wien. Maximale Dezentralisierung, minimale Gebühren.</p>
 </section>
 
-<div class="divider"></div>
+<div class="stats-container" id="stats">
+    <div class="grid">
+        <div class="card"><h3>Live Stake</h3><div id="liveStake" class="value loading-pulse">Lade...</div></div>
+        <div class="card"><h3>Delegatoren</h3><div id="liveDelegators" class="value loading-pulse">Lade...</div></div>
+        <div class="card"><h3>Saturation</h3><div id="liveSat" class="value loading-pulse">Lade...</div></div>
+        <div class="card"><h3>Blocks (Epoch)</h3><div id="liveBlocks" class="value loading-pulse">Lade...</div></div>
+    </div>
+</div>
 
-<section id="live-stats">
-  <div class="inner">
-    <p class="slabel">Real-Time Data</p>
-    <h2>Live Pool Stats</h2>
-    <p class="desc">Live data fetched from the Koios API &mdash; updated every 60 seconds.</p>
-    <div id="stats-status" class="stats-status">Loading live data&hellip;</div>
-    <div class="live-grid" id="liveGrid">
-      <div class="live-card" id="card-stake">
-        <div class="live-icon">&#x1F4B0;</div>
-        <div class="live-val" id="val-stake"><span class="loader"></span></div>
-        <div class="live-lbl">Live Stake</div>
-      </div>
-      <div class="live-card" id="card-delegators">
-        <div class="live-icon">&#x1F465;</div>
-        <div class="live-val" id="val-delegators"><span class="loader"></span></div>
-        <div class="live-lbl">Delegators</div>
-      </div>
-      <div class="live-card" id="card-saturation">
-        <div class="live-icon">&#x1F4CA;</div>
-        <div class="live-val" id="val-saturation"><span class="loader"></span></div>
-        <div class="live-lbl">Saturation</div>
-      </div>
-      <div class="live-card" id="card-pledge">
-        <div class="live-icon">&#x1F512;</div>
-        <div class="live-val" id="val-pledge"><span class="loader"></span></div>
-        <div class="live-lbl">Pledge</div>
-      </div>
-      <div class="live-card" id="card-blocks">
-        <div class="live-icon">&#x26D3;</div>
-        <div class="live-val" id="val-blocks"><span class="loader"></span></div>
-        <div class="live-lbl">Blocks Minted</div>
-      </div>
-      <div class="live-card" id="card-epoch">
-        <div class="live-icon">&#x1F551;</div>
-        <div class="live-val" id="val-epoch"><span class="loader"></span></div>
-        <div class="live-lbl">Current Epoch</div>
-      </div>
+<section class="charts-section">
+    <div class="chart-card">
+        anvas id="stakeChart"></canvas>
     </div>
-    <div class="refresh-row">
-      <span id="lastUpdate" class="last-update"></span>
-      <button class="copy-btn" onclick="fetchPoolStats()">&#x21BB; Refresh</button>
+    <div class="chart-card">
+        anvas id="rosChart"></canvas>
     </div>
-  </div>
 </section>
 
-<div class="divider"></div>
+<script>
+    const POOL_ID = 'pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z';
+    const API = 'https://api.koios.rest/api/v1';
 
-<section id="pool">
-  <div class="inner">
-    <p class="slabel">Pool Information</p>
-    <h2>Our Pool ID</h2>
-    <p class="desc">Use this ID to delegate your ADA to TAPSY in any Cardano wallet.</p>
-    <div class="pool-box">
-      <div class="lbl">Pool ID</div>
-      <div class="pool-id" id="poolIdText">d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
-      <button class="copy-btn" onclick="copyPoolId()">&#x1F4CB; Copy</button>
-    </div>
-    <div class="pool-box" style="margin-top:1rem">
-      <div class="lbl">Bech32 Pool ID</div>
-      <div class="pool-id">pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z</div>
-      <button class="copy-btn" onclick="copyBech32()">&#x1F4CB; Copy</button>
-    </div>
-  </div>
-</section>
+    async function fetchData() {
+        try {
+            // 1. Live Stats
+            const res = await fetch(`${API}/pool_history?_pool_bech32=${POOL_ID}&limit=10`);
+            const data = await res.json();
+            const latest = data[0];
 
-<div class="divider"></div>
+            document.getElementById('liveStake').innerText = (latest.active_stake / 1000000000000).toFixed(2) + 'M ADA';
+            document.getElementById('liveDelegators').innerText = latest.delegator_cnt;
+            document.getElementById('liveSat').innerText = parseFloat(latest.saturation_pct).toFixed(2) + '%';
+            document.getElementById('liveBlocks').innerText = latest.block_cnt;
 
-<section id="news">
-  <div class="inner">
-    <p class="slabel">Latest Updates</p>
-    <h2>News</h2>
-    <div class="news-card">
-      <div class="news-date">August 2020</div>
-      <div class="news-title">TAPSY pool is live on Cardano Mainnet &mdash; Pool ID: d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
-    </div>
-  </div>
-</section>
+            // Remove loading pulses
+            document.querySelectorAll('.loading-pulse').forEach(el => el.classList.remove('loading-pulse'));
 
-<div class="divider"></div>
+            // 2. Charts
+            const labels = data.map(d => 'E' + d.epoch_no).reverse();
+            const stakeValues = data.map(d => d.active_stake / 1000000000000).reverse();
+            const rosValues = data.map(d => d.epoch_ros * 100).reverse();
 
-<section id="specs">
-  <div class="inner">
-    <p class="slabel">Infrastructure</p>
-    <h2>Server Specs</h2>
-    <p class="desc">Dedicated bare-metal hardware for maximum reliability and uptime.</p>
-    <div class="specs-grid">
-      <div class="spec"><div class="spec-icon">&#x1F5A5;&#xFE0F;</div><div class="spec-lbl">Setup</div><div class="spec-val">1 Block Producer + 2 Relays</div></div>
-      <div class="spec"><div class="spec-icon">&#x26A1;</div><div class="spec-lbl">CPU</div><div class="spec-val">6 Cores per Server</div></div>
-      <div class="spec"><div class="spec-icon">&#x1F9E0;</div><div class="spec-lbl">RAM</div><div class="spec-val">32 GB per Server</div></div>
-      <div class="spec"><div class="spec-icon">&#x1F4BE;</div><div class="spec-lbl">Storage</div><div class="spec-val">800 GB SSD</div></div>
-      <div class="spec"><div class="spec-icon">&#x1F4CD;</div><div class="spec-lbl">Location</div><div class="spec-val">Germany (Dedicated)</div></div>
-      <div class="spec"><div class="spec-icon">&#x1F512;</div><div class="spec-lbl">Security</div><div class="spec-val">Each on dedicated server</div></div>
-    </div>
-  </div>
-</section>
+            new Chart('stakeChart', {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Active Stake (Mio ADA)',
+                        data: stakeValues,
+                        borderColor: '#00d4aa',
+                        backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            });
 
-<section class="cta">
-  <h2>Ready to Delegate?</h2>
-  <p>Join TapTap Vienna and support Cardano decentralization. Every ADA counts.</p>
-  <div class="btns">
-    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-g" target="_blank">Tap Us on Pooltool.io</a>
-    <a href="https://t.me/taptapstaking" class="btn btn-o" target="_blank">Join Telegram</a>
-  </div>
-</section>
+            new Chart('rosChart', {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'ROS % (Return on Staking)',
+                        data: rosValues,
+                        backgroundColor: '#00a8ff'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
 
-<footer>
-  &copy; TapTapTeam Vienna | Powered by <a href="https://api.koios.rest" style="color:var(--primary)" target="_blank">Koios API</a>
-</footer>
+        } catch (err) {
+            console.error("Fehler beim Laden der API:", err);
+        }
+    }
+
+    fetchData();
+</script>
+
+</body>
+</html>
+
