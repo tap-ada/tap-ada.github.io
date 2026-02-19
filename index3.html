@@ -149,43 +149,37 @@ footer{background:var(--dark2);border-top:1px solid rgba(255,255,255,.06);paddin
 
 <footer>&copy; TapTapTeam | Design: HTML5 UP</footer>
 <script>
-  (function () {
-    const BECH32 = 'pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z';
-    const API    = 'https://api.koios.rest/api/v1/pool_stake_snapshot?_pool_bech32=' + BECH32;
+(function () {
+  const BECH32 = 'pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z';
+  const API = 'https://api.koios.rest/api/v1/pool_stake_snapshot?_pool_bech32=' + BECH32;
+  const elVal = document.getElementById('tapsy-stake');
+  const elLabel = document.getElementById('tapsy-stake-label');
 
-    const elVal   = document.getElementById('tapsy-stake');
-    const elLabel = document.getElementById('tapsy-stake-label');
+  function fmtADA(lovelace) {
+    return Math.round(Number(lovelace) / 1e6).toLocaleString('de-AT') + ' ADA';
+  }
 
-    function fmtADA(lovelace) {
-      return Math.round(Number(lovelace) / 1e6).toLocaleString('de-AT') + ' ADA';
+  async function fetchStake() {
+    if (elVal) { elVal.textContent = '…'; elVal.className = 'v loading'; }
+    try {
+      const res = await fetch(API, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const rows = await res.json();
+      const snap = rows.find(r => r.snapshot === 'Mark')
+                || rows.find(r => r.snapshot === 'Set')
+                || rows[0];
+      if (!snap || !snap.pool_stake) throw new Error('Kein pool_stake');
+      if (elVal) { elVal.textContent = fmtADA(snap.pool_stake); elVal.className = 'v'; }
+      if (elLabel) { elLabel.textContent = 'Live Stake'; }
+    } catch (err) {
+      if (elVal) { elVal.textContent = 'N/A'; elVal.className = 'v'; }
+      console.warn('[TAPSY Stake]', err.message);
     }
+  }
 
-    async function fetchStake() {
-      if (elVal) { elVal.textContent = '…'; elVal.className = 'v loading'; }
-
-      try {
-        const res  = await fetch(API, { headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const rows = await res.json();
-
-        const snap = rows.find(r => r.snapshot === 'Mark')
-                  || rows.find(r => r.snapshot === 'Set')
-                  || rows[0];
-
-        if (!snap || !snap.pool_stake) throw new Error('Kein pool_stake');
-
-        if (elVal)   { elVal.textContent = fmtADA(snap.pool_stake); elVal.className = 'v'; }
-        if (elLabel) { elLabel.textContent = 'Live Stake'; }
-
-      } catch (err) {
-        if (elVal) { elVal.textContent = 'N/A'; elVal.className = 'v'; }
-        console.warn('[TAPSY Stake]', err.message);
-      }
-    }
-
-    fetchStake();
-    setInterval(fetchStake, 60000);
-  })();
+  fetchStake();
+  setInterval(fetchStake, 60000);
+})();
 </script>
 </body>
 </html>
