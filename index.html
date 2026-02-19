@@ -1,9 +1,16 @@
-<!-- TAPSY TapTap Vienna – neue verbesserte Version -->
+<!DOCTYPE HTML>
+<html lang="de">
+<head>
+<title>TapTap Vienna | TAPSY Cardano Stake Pool</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="TAPSY – TapTap Vienna Cardano Stake Pool. Low fees, high reliability, dedicated hardware from Vienna." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
 
-<!-- HEADER -->
 <header>
   <div class="logo"><span>TAP</span>SY | TapTap Vienna</div>
   <nav id="deskNav">
@@ -46,21 +53,53 @@
   </div>
 </section>
 
-<!-- LIVE STATS -->
 <div class="divider"></div>
+
+<!-- LIVE STATS -->
 <section id="livestats">
   <div class="inner">
     <p class="slabel">Live Data</p>
     <h2>Pool Live Stats</h2>
     <p class="desc">Echtzeitdaten direkt von der Cardano Blockchain via Koios API.</p>
-    <div id="statusBadge" class="status-live"><span class="status-dot"></span> <span id="statusText">Lade Daten...</span></div>
+    <div id="statusBadge" class="status-live">
+      <span class="status-dot"></span>
+      <span id="statusText">Lade Daten...</span>
+    </div>
     <div class="live-grid">
-      <div class="live-card"><span class="icon">📊</span><span class="num loading-pulse" id="liveEpoch">—</span><span class="lbl">Aktuelle Epoche</span></div>
-      <div class="live-card"><span class="icon">🏦</span><span class="num loading-pulse" id="liveStake">—</span><span class="lbl">Live Stake</span><span class="sub" id="liveStakeSub"></span></div>
-      <div class="live-card"><span class="icon">👥</span><span class="num loading-pulse" id="liveDelegators">—</span><span class="lbl">Delegatoren</span></div>
-      <div class="live-card"><span class="icon">📈</span><span class="num loading-pulse" id="liveSat">—</span><span class="lbl">Saturation</span><div class="sat-bar-wrap"><div class="sat-bar-bg"><div class="sat-bar-fill" id="satBar"></div></div></div></div>
-      <div class="live-card"><span class="icon">🧱</span><span class="num loading-pulse" id="liveBlocks">—</span><span class="lbl">Blocks (letzte Epoche)</span></div>
-      <div class="live-card"><span class="icon">💰</span><span class="num loading-pulse" id="liveROS">—</span><span class="lbl">Epoch ROS</span></div>
+      <div class="live-card">
+        <span class="icon">📊</span>
+        <span class="num loading-pulse" id="liveEpoch">—</span>
+        <span class="lbl">Aktuelle Epoche</span>
+      </div>
+      <div class="live-card">
+        <span class="icon">🏦</span>
+        <span class="num loading-pulse" id="liveStake">—</span>
+        <span class="lbl">Live Stake</span>
+        <span class="sub" id="liveStakeSub"></span>
+      </div>
+      <div class="live-card">
+        <span class="icon">👥</span>
+        <span class="num loading-pulse" id="liveDelegators">—</span>
+        <span class="lbl">Delegatoren</span>
+      </div>
+      <div class="live-card">
+        <span class="icon">📈</span>
+        <span class="num loading-pulse" id="liveSat">—</span>
+        <span class="lbl">Saturation</span>
+        <div class="sat-bar-wrap">
+          <div class="sat-bar-bg"><div class="sat-bar-fill" id="satBar"></div></div>
+        </div>
+      </div>
+      <div class="live-card">
+        <span class="icon">🧱</span>
+        <span class="num loading-pulse" id="liveBlocks">—</span>
+        <span class="lbl">Blocks (letzte Epoche)</span>
+      </div>
+      <div class="live-card">
+        <span class="icon">💰</span>
+        <span class="num loading-pulse" id="liveROS">—</span>
+        <span class="lbl">Epoch ROS</span>
+      </div>
     </div>
     <div class="epoch-box">
       <div class="epoch-info">
@@ -68,16 +107,20 @@
         <div class="epoch-label">Epoche</div>
       </div>
       <div class="epoch-progress">
-        <div style="font-size:.8rem;margin-bottom:.3rem;">Epoche Fortschritt</div>
+        <div style="font-size:.8rem;margin-bottom:.3rem;color:var(--muted)">Epoche Fortschritt</div>
         <div class="epoch-bar-bg"><div class="epoch-bar-fill" id="epochBar" style="width:0%"></div></div>
-        <div class="epoch-time"><span id="epochStart">—</span><span id="epochEnd">—</span></div>
+        <div class="epoch-time">
+          <span id="epochStart">—</span>
+          <span id="epochEnd">—</span>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CHARTS -->
 <div class="divider"></div>
+
+<!-- CHARTS -->
 <section id="charts">
   <div class="inner">
     <p class="slabel">Historische Daten</p>
@@ -87,24 +130,25 @@
       <div class="chart-card chart-full">
         <h3>Active Stake (letzte 10 Epochen)</h3>
         <p class="chart-sub">in Millionen ADA</p>
-        <div class="chart-wrap"><canvas id="stakeChart"></canvas></div>
+        <div class="chart-wrap">anvas id="stakeChart"></canvas></div>
       </div>
       <div class="chart-card">
         <h3>Blocks produziert</h3>
         <p class="chart-sub">pro Epoche</p>
-        <div class="chart-wrap"><canvas id="blockChart"></canvas></div>
+        <div class="chart-wrap">anvas id="blockChart"></canvas></div>
       </div>
       <div class="chart-card">
         <h3>Epoch ROS</h3>
         <p class="chart-sub">Return on Staking %</p>
-        <div class="chart-wrap"><canvas id="rosChart"></canvas></div>
+        <div class="chart-wrap">anvas id="rosChart"></canvas></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- POOL ID -->
 <div class="divider"></div>
+
+<!-- POOL ID -->
 <section id="pool">
   <div class="inner">
     <p class="slabel">Pool Information</p>
@@ -113,26 +157,28 @@
     <div class="pool-box">
       <div class="lbl">POOL ID</div>
       <div class="pool-id" id="pid">d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
-      <button class="copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('pid').textContent);this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)">Copy</button>
+      <button class="copy-btn" id="copyBtn">Copy</button>
     </div>
   </div>
 </section>
 
-<!-- NEWS -->
 <div class="divider"></div>
+
+<!-- NEWS -->
 <section id="news">
   <div class="inner">
     <p class="slabel">Latest Updates</p>
     <h2>News</h2>
     <div class="news-card">
       <div class="news-date">August 2020</div>
-      <div class="news-title">TAPSY pool is live on Cardano Mainnet — Pool ID: d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
+      <div class="news-title">TAPSY pool is live on Cardano Mainnet</div>
     </div>
   </div>
 </section>
 
-<!-- SPECS -->
 <div class="divider"></div>
+
+<!-- SPECS -->
 <section id="specs">
   <div class="inner">
     <p class="slabel">Infrastructure</p>
@@ -160,3 +206,8 @@
 </section>
 
 <footer>&copy; TapTapTeam Vienna | Powered by Koios API</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
