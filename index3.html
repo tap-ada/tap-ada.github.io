@@ -1,213 +1,142 @@
-<!DOCTYPE HTML>
-<html lang="de">
-<head>
-<title>TapTap Vienna | TAPSY Cardano Stake Pool</title>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<meta name="description" content="TAPSY – TapTap Vienna Cardano Stake Pool. Low fees, high reliability, dedicated hardware from Vienna." />
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-
+<!-- TapTap Vienna | TAPSY Cardano Stake Pool - Enhanced Version -->
 <header>
-  <div class="logo"><span>TAP</span>SY | TapTap Vienna</div>
-  <nav id="deskNav">
-    <ul>
-      <li><a href="#hero">Home</a></li>
-      <li><a href="#livestats">Live Stats</a></li>
-      <li><a href="#charts">Charts</a></li>
-      <li><a href="#pool">Pool ID</a></li>
-      <li><a href="#specs">Specs</a></li>
-    </ul>
-  </nav>
-  <button class="hamburger" id="menuBtn" aria-label="Menu">
+  <div class="logo">TAP<span>SY</span> | TapTap Vienna</div>
+  <button class="menu-toggle" id="menuToggle" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
+  <nav id="mainNav">
+    <ul>
+      <li><a href="#hero" onclick="closeMenu()">Home</a></li>
+      <li><a href="#live-stats" onclick="closeMenu()">Live Stats</a></li>
+      <li><a href="#pool" onclick="closeMenu()">Pool ID</a></li>
+      <li><a href="#news" onclick="closeMenu()">News</a></li>
+      <li><a href="#specs" onclick="closeMenu()">Specs</a></li>
+    </ul>
+  </nav>
 </header>
 
-<div class="mobile-menu" id="mobileMenu">
-  <ul>
-    <li><a href="#hero" onclick="closeMenu()">Home</a></li>
-    <li><a href="#livestats" onclick="closeMenu()">Live Stats</a></li>
-    <li><a href="#charts" onclick="closeMenu()">Charts</a></li>
-    <li><a href="#pool" onclick="closeMenu()">Pool ID</a></li>
-    <li><a href="#specs" onclick="closeMenu()">Specs</a></li>
-  </ul>
-</div>
-
-<!-- HERO -->
-<section id="hero" class="hero">
-  <div class="badge"><span class="dot"></span> LIVE ON CARDANO MAINNET</div>
-  <h1>It's a small tap for you,<br><em>one giant tap for Cardano!</em></h1>
-  <p class="subtitle">TapTap Vienna — a Cardano Stake Pool from Vienna.<br>Maximum decentralization, minimum fees.</p>
+<section class="hero" id="hero">
+  <div class="badge"><span class="dot"></span>Live on Cardano Mainnet</div>
+  <h1>It&rsquo;s a small tap for you,<br><em>one giant tap for Cardano!</em></h1>
+  <p class="subtitle">TapTap Vienna &mdash; a Cardano Stake Pool from Vienna.<br>Maximum decentralization, minimum fees.</p>
   <div class="stats">
     <div class="stat"><span class="v">340 ADA</span><span class="l">Fixed Fee / Epoch</span></div>
     <div class="stat"><span class="v">1%</span><span class="l">Variable Fee</span></div>
     <div class="stat"><span class="v">TAPSY</span><span class="l">Ticker ID</span></div>
   </div>
   <div class="btns">
-    <a href="https://t.me/taptapstaking" class="btn btn-g">Telegram News</a>
-    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-o">View on Pooltool.io</a>
+    <a href="https://t.me/taptapstaking" class="btn btn-g" target="_blank">Telegram News</a>
+    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-o" target="_blank">View on Pooltool.io</a>
   </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- LIVE STATS -->
-<section id="livestats">
+<section id="live-stats">
   <div class="inner">
-    <p class="slabel">Live Data</p>
-    <h2>Pool Live Stats</h2>
-    <p class="desc">Echtzeitdaten direkt von der Cardano Blockchain via Koios API.</p>
-    <div id="statusBadge" class="status-live">
-      <span class="status-dot"></span>
-      <span id="statusText">Lade Daten...</span>
-    </div>
-    <div class="live-grid">
-      <div class="live-card">
-        <span class="icon">📊</span>
-        <span class="num loading-pulse" id="liveEpoch">—</span>
-        <span class="lbl">Aktuelle Epoche</span>
+    <p class="slabel">Real-Time Data</p>
+    <h2>Live Pool Stats</h2>
+    <p class="desc">Live data fetched from the Koios API &mdash; updated every 60 seconds.</p>
+    <div id="stats-status" class="stats-status">Loading live data&hellip;</div>
+    <div class="live-grid" id="liveGrid">
+      <div class="live-card" id="card-stake">
+        <div class="live-icon">&#x1F4B0;</div>
+        <div class="live-val" id="val-stake"><span class="loader"></span></div>
+        <div class="live-lbl">Live Stake</div>
       </div>
-      <div class="live-card">
-        <span class="icon">🏦</span>
-        <span class="num loading-pulse" id="liveStake">—</span>
-        <span class="lbl">Live Stake</span>
-        <span class="sub" id="liveStakeSub"></span>
+      <div class="live-card" id="card-delegators">
+        <div class="live-icon">&#x1F465;</div>
+        <div class="live-val" id="val-delegators"><span class="loader"></span></div>
+        <div class="live-lbl">Delegators</div>
       </div>
-      <div class="live-card">
-        <span class="icon">👥</span>
-        <span class="num loading-pulse" id="liveDelegators">—</span>
-        <span class="lbl">Delegatoren</span>
+      <div class="live-card" id="card-saturation">
+        <div class="live-icon">&#x1F4CA;</div>
+        <div class="live-val" id="val-saturation"><span class="loader"></span></div>
+        <div class="live-lbl">Saturation</div>
       </div>
-      <div class="live-card">
-        <span class="icon">📈</span>
-        <span class="num loading-pulse" id="liveSat">—</span>
-        <span class="lbl">Saturation</span>
-        <div class="sat-bar-wrap">
-          <div class="sat-bar-bg"><div class="sat-bar-fill" id="satBar"></div></div>
-        </div>
+      <div class="live-card" id="card-pledge">
+        <div class="live-icon">&#x1F512;</div>
+        <div class="live-val" id="val-pledge"><span class="loader"></span></div>
+        <div class="live-lbl">Pledge</div>
       </div>
-      <div class="live-card">
-        <span class="icon">🧱</span>
-        <span class="num loading-pulse" id="liveBlocks">—</span>
-        <span class="lbl">Blocks (letzte Epoche)</span>
+      <div class="live-card" id="card-blocks">
+        <div class="live-icon">&#x26D3;</div>
+        <div class="live-val" id="val-blocks"><span class="loader"></span></div>
+        <div class="live-lbl">Blocks Minted</div>
       </div>
-      <div class="live-card">
-        <span class="icon">💰</span>
-        <span class="num loading-pulse" id="liveROS">—</span>
-        <span class="lbl">Epoch ROS</span>
+      <div class="live-card" id="card-epoch">
+        <div class="live-icon">&#x1F551;</div>
+        <div class="live-val" id="val-epoch"><span class="loader"></span></div>
+        <div class="live-lbl">Current Epoch</div>
       </div>
     </div>
-    <div class="epoch-box">
-      <div class="epoch-info">
-        <div class="epoch-no" id="epochNum">—</div>
-        <div class="epoch-label">Epoche</div>
-      </div>
-      <div class="epoch-progress">
-        <div style="font-size:.8rem;margin-bottom:.3rem;color:var(--muted)">Epoche Fortschritt</div>
-        <div class="epoch-bar-bg"><div class="epoch-bar-fill" id="epochBar" style="width:0%"></div></div>
-        <div class="epoch-time">
-          <span id="epochStart">—</span>
-          <span id="epochEnd">—</span>
-        </div>
-      </div>
+    <div class="refresh-row">
+      <span id="lastUpdate" class="last-update"></span>
+      <button class="copy-btn" onclick="fetchPoolStats()">&#x21BB; Refresh</button>
     </div>
   </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- CHARTS -->
-<section id="charts">
-  <div class="inner">
-    <p class="slabel">Historische Daten</p>
-    <h2>Pool Performance</h2>
-    <p class="desc">Stake, Blocks und Return on Staking (ROS) der letzten 10 Epochen.</p>
-    <div class="charts-grid">
-      <div class="chart-card chart-full">
-        <h3>Active Stake (letzte 10 Epochen)</h3>
-        <p class="chart-sub">in Millionen ADA</p>
-        <div class="chart-wrap"><anvas id>="stakeChart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Blocks produziert</h3>
-        <p class="chart-sub">pro Epoche</p>
-        <div class="chart-wrap"><anvas id>="blockChart"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <h3>Epoch ROS</h3>
-        <p class="chart-sub">Return on Staking %</p>
-        <div class="chart-wrap"><anvas id>="rosChart"></canvas></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- POOL ID -->
 <section id="pool">
   <div class="inner">
     <p class="slabel">Pool Information</p>
     <h2>Our Pool ID</h2>
     <p class="desc">Use this ID to delegate your ADA to TAPSY in any Cardano wallet.</p>
     <div class="pool-box">
-      <div class="lbl">POOL ID</div>
-      <div class="pool-id" id="pid">d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
-      <button class="copy-btn" id="copyBtn">Copy</button>
+      <div class="lbl">Pool ID</div>
+      <div class="pool-id" id="poolIdText">d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
+      <button class="copy-btn" onclick="copyPoolId()">&#x1F4CB; Copy</button>
+    </div>
+    <div class="pool-box" style="margin-top:1rem">
+      <div class="lbl">Bech32 Pool ID</div>
+      <div class="pool-id">pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z</div>
+      <button class="copy-btn" onclick="copyBech32()">&#x1F4CB; Copy</button>
     </div>
   </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- NEWS -->
 <section id="news">
   <div class="inner">
     <p class="slabel">Latest Updates</p>
     <h2>News</h2>
     <div class="news-card">
       <div class="news-date">August 2020</div>
-      <div class="news-title">TAPSY pool is live on Cardano Mainnet</div>
+      <div class="news-title">TAPSY pool is live on Cardano Mainnet &mdash; Pool ID: d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9</div>
     </div>
   </div>
 </section>
 
 <div class="divider"></div>
 
-<!-- SPECS -->
 <section id="specs">
   <div class="inner">
     <p class="slabel">Infrastructure</p>
     <h2>Server Specs</h2>
     <p class="desc">Dedicated bare-metal hardware for maximum reliability and uptime.</p>
     <div class="specs-grid">
-      <div class="spec"><div class="spec-icon">🖥️</div><div class="spec-lbl">Setup</div><div class="spec-val">1 Block Producer + 2 Relays</div></div>
-      <div class="spec"><div class="spec-icon">⚡</div><div class="spec-lbl">CPU</div><div class="spec-val">6 Cores per Server</div></div>
-      <div class="spec"><div class="spec-icon">🧠</div><div class="spec-lbl">RAM</div><div class="spec-val">32 GB per Server</div></div>
-      <div class="spec"><div class="spec-icon">💾</div><div class="spec-lbl">Storage</div><div class="spec-val">800 GB SSD</div></div>
-      <div class="spec"><div class="spec-icon">📍</div><div class="spec-lbl">Location</div><div class="spec-val">Germany (Dedicated)</div></div>
-      <div class="spec"><div class="spec-icon">🔒</div><div class="spec-lbl">Security</div><div class="spec-val">Each on dedicated server</div></div>
+      <div class="spec"><div class="spec-icon">&#x1F5A5;&#xFE0F;</div><div class="spec-lbl">Setup</div><div class="spec-val">1 Block Producer + 2 Relays</div></div>
+      <div class="spec"><div class="spec-icon">&#x26A1;</div><div class="spec-lbl">CPU</div><div class="spec-val">6 Cores per Server</div></div>
+      <div class="spec"><div class="spec-icon">&#x1F9E0;</div><div class="spec-lbl">RAM</div><div class="spec-val">32 GB per Server</div></div>
+      <div class="spec"><div class="spec-icon">&#x1F4BE;</div><div class="spec-lbl">Storage</div><div class="spec-val">800 GB SSD</div></div>
+      <div class="spec"><div class="spec-icon">&#x1F4CD;</div><div class="spec-lbl">Location</div><div class="spec-val">Germany (Dedicated)</div></div>
+      <div class="spec"><div class="spec-icon">&#x1F512;</div><div class="spec-lbl">Security</div><div class="spec-val">Each on dedicated server</div></div>
     </div>
   </div>
 </section>
 
-<!-- CTA -->
 <section class="cta">
   <h2>Ready to Delegate?</h2>
   <p>Join TapTap Vienna and support Cardano decentralization. Every ADA counts.</p>
   <div class="btns">
-    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-g">Tap Us on Pooltool.io</a>
-    <a href="https://t.me/taptapstaking" class="btn btn-o">Join Telegram</a>
+    <a href="https://pooltool.io/pool/d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9/blocks" class="btn btn-g" target="_blank">Tap Us on Pooltool.io</a>
+    <a href="https://t.me/taptapstaking" class="btn btn-o" target="_blank">Join Telegram</a>
   </div>
 </section>
 
-<footer>&copy; TapTapTeam Vienna | Powered by Koios API</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="assets/js/main.js"></script>
-</body>
-</html>
+<footer>
+  &copy; TapTapTeam Vienna | Powered by <a href="https://api.koios.rest" style="color:var(--primary)" target="_blank">Koios API</a>
+</footer>
