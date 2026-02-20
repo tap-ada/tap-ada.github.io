@@ -1,0 +1,56 @@
+{
+  "poolInfo": {
+    "pool_id_bech32": "pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z",
+    "pool_id_hex": "d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9",
+    "active_epoch_no": 419,
+    "vrf_key_hash": "235b76cb913acf64b0fba3ed5f515738751c0bc76bbcd8912425e9931478dd7a",
+    "margin": 0.01,
+    "fixed_cost": "340000000",
+    "pledge": "5000000",
+    "deposit": null,
+    "reward_addr": "stake1u9jln683r9ysex8v8mft6wt2thha9xpeapm92f52gswzp5sgc5ve4",
+    "reward_addr_delegated_drep": "drep_always_abstain",
+    "owners": [
+      "stake1u9msfg7dtt3plmtfznkxljwes70wxsqgc4ql5qxe4et37hcm98d6n"
+    ],
+    "relays": [
+      {
+        "dns": null,
+        "srv": null,
+        "ipv4": "45.83.107.139",
+        "ipv6": null,
+        "port": 3001
+      },
+      {
+        "dns": null,
+        "srv": null,
+        "ipv4": "45.83.107.231",
+        "ipv6": null,
+        "port": 3001
+      }
+    ],
+    "meta_url": "https://tap-ada.github.io/poolmeta.json",
+    "meta_hash": "eecc610ce196d8f56b9f7dbda6fb1617c9a731286a573aaec835a99d0dfee058",
+    "meta_json": {
+      "name": "TapTap Vienna",
+      "ticker": "TAPSY",
+      "homepage": "https://tap-ada.github.io",
+      "description": "low fees|safe|reliable|known from ITN|TU Wien students"
+    },
+    "pool_status": "registered",
+    "retiring_epoch": null,
+    "op_cert": "1dad24f8b83d95e0109bc425ceacb3cbcb7f1c4a7ecb1f4b71a75a31efcf4f0d",
+    "op_cert_counter": 27,
+    "active_stake": "7423733698518",
+    "sigma": 0.00034507498786567946,
+    "block_count": 7292,
+    "live_pledge": "9773409",
+    "live_stake": "7426299264794",
+    "live_delegators": 718,
+    "live_saturation": 9.66,
+    "voting_power": "7426667438171"
+  },
+  "delegators": [],
+  "history": [],
+  "generated_at": "2026-02-20T09:09:26.643074+00:00"
+}
