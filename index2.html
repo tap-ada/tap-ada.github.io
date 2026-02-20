@@ -10,7 +10,7 @@
   <meta property="og:title" content="TapTap Vienna [TAPSY] – Cardano Stake Pool" />
   <meta property="og:description" content="Delegate your ADA to TAPSY and support maximum decentralization with minimum fees." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://tap-ada.github.io" />
+  <meta property="og:url" content="https://tap-ada.github.io/index2" />
 
   <style>
     :root {
@@ -678,7 +678,7 @@ pool1ewrm7y47s9hv6hxku9n5gfnsuspymp0qqpwgvgm9rvm37cek2h6
       <div class="container">
         <h2>Latest pool news</h2>
         <p class="section-lead">
-          Short updates reflecting the current stake and delegator numbers from the live explorer data.[web:71]
+          Short update generated from the current stake and delegator numbers.[web:71]
         </p>
 
         <div class="timeline">
@@ -829,41 +829,51 @@ pool1ewrm7y47s9hv6hxku9n5gfnsuspymp0qqpwgvgm9rvm37cek2h6
   <script>
     const POOL_ID = "pool1ewrm7y47s9hv6hxku9n5gfnsuspymp0qqpwgvgm9rvm37cek2h6";
     const RAW_URL = `https://js.cexplorer.io/api-static/pool/${POOL_ID}.json`;
-    const PROXY_URL = `https://corsproxy.io/?${encodeURIComponent(RAW_URL)}`;
+    const PROXY_URL = `https://corsproxy.io/?url=${encodeURIComponent(RAW_URL)}`; // wichtig: ?url=[web:61][web:71]
 
     async function loadPoolStats() {
       try {
         const resp = await fetch(PROXY_URL);
         if (!resp.ok) throw new Error("Explorer API error");
         const json = await resp.json();
-        const data = json.data || json; // je nach Struktur[web:71]
 
-        // stake in Lovelace -> ADA
+        // Daten können unter json.data oder direkt unter json liegen[web:71]
+        const data = json.data || json;
+
         if (data.stake != null) {
           const stakeADA = Number(data.stake) / 1_000_000;
           document.getElementById("liveStake").textContent =
             stakeADA.toFixed(2) + " M ADA";
+        } else {
+          document.getElementById("liveStake").textContent = "n/a";
         }
 
         if (data.blocks_lifetime != null) {
           document.getElementById("lifetimeBlocks").textContent =
             data.blocks_lifetime.toString();
+        } else {
+          document.getElementById("lifetimeBlocks").textContent = "n/a";
         }
 
         if (data.delegators != null) {
           document.getElementById("delegators").textContent =
             data.delegators.toString();
+        } else {
+          document.getElementById("delegators").textContent = "n/a";
         }
 
-        // dynamischer News-Text
+        // News-Text dynamisch aus Stake & Delegators
         const newsText = document.getElementById("news-text");
         const newsHeadline = document.getElementById("news-headline");
 
         if (newsText && newsHeadline) {
           const delegators = data.delegators ?? "many";
-          const stakeADA = data.stake ? (Number(data.stake) / 1_000_000).toFixed(2) : null;
+          const stakeADA = data.stake
+            ? (Number(data.stake) / 1_000_000).toFixed(2)
+            : null;
 
-          newsHeadline.textContent = "Strong community stake and growing delegators";
+          newsHeadline.textContent =
+            "Strong community stake and growing delegators";
 
           newsText.textContent =
             "TAPSY currently operates with about " +
@@ -877,6 +887,11 @@ pool1ewrm7y47s9hv6hxku9n5gfnsuspymp0qqpwgvgm9rvm37cek2h6
         document.getElementById("liveStake").textContent = "Error";
         document.getElementById("lifetimeBlocks").textContent = "Error";
         document.getElementById("delegators").textContent = "Error";
+        const newsText = document.getElementById("news-text");
+        if (newsText) {
+          newsText.textContent =
+            "Live data could not be loaded at the moment. Please check again later or open Cexplorer / PoolTool for up-to-date pool statistics.";
+        }
       }
     }
 
