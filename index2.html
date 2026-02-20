@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>TapTap Vienna — Cardano Stake Pool</title>
-  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Statische Pool-Stats via GitHub Actions.">
+  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Statische Pool-Stats und ROS via GitHub Actions.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
@@ -46,16 +46,12 @@
       color: inherit;
     }
 
-    /* Layout Container */
-
     .container {
       width: 100%;
       max-width: 1120px;
       margin: 0 auto;
       padding: 0 1rem;
     }
-
-    /* Header */
 
     .site-header {
       padding: 1.5rem 0 0.75rem;
@@ -77,8 +73,6 @@
       font-size: 0.9rem;
       color: var(--text-muted);
     }
-
-    /* Hero */
 
     .hero {
       padding: 2rem 0 1.5rem;
@@ -133,8 +127,6 @@
       box-shadow: 0 26px 60px rgba(16, 185, 129, 0.55);
     }
 
-    /* Dashboard */
-
     .dashboard {
       padding: 1rem 0 2.5rem;
     }
@@ -161,10 +153,14 @@
     .refresh-info {
       font-size: 0.8rem;
       color: var(--text-muted);
-      margin-bottom: 0.75rem;
+      margin-bottom: 0.25rem;
     }
 
-    /* Stat Cards grid */
+    .ros-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
 
     .stats-grid {
       display: grid;
@@ -245,8 +241,6 @@
       margin-top: 0.1rem;
     }
 
-    /* Chart area */
-
     .chart-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -273,8 +267,6 @@
       height: 260px;
     }
 
-    /* Footer */
-
     .site-footer {
       border-top: 1px solid rgba(148, 163, 184, 0.2);
       padding: 1rem 0 1.5rem;
@@ -290,8 +282,6 @@
     .site-footer a:hover {
       text-decoration: underline;
     }
-
-    /* Responsive Breakpoints */
 
     @media (min-width: 600px) {
       .hero {
@@ -365,7 +355,12 @@
         <h2>Pool‑Stats (statisch)</h2>
         <span id="last-updated" class="dashboard-tagline">lädt…</span>
       </div>
-      <p class="refresh-info">Daten werden periodisch via GitHub Actions aus Koios abgerufen und als JSON bereitgestellt.</p>
+      <p class="refresh-info">
+        Daten werden periodisch via GitHub Actions aus Koios abgerufen und als JSON bereitgestellt.
+      </p>
+      <p class="ros-info" id="ros-info">
+        <!-- wird per JS mit Durchschnitts-ROS gefüllt -->
+      </p>
 
       <div class="stats-grid">
         <div class="stat-card">
@@ -407,13 +402,13 @@
 
       <div class="chart-grid">
         <div class="chart-card">
-          <h3>Active Stake History (letzte 10 Epochs)</h3>
+          <h3>Active Stake History (letzte 30 Epochs)</h3>
           <div class="chart-wrapper">
             <canvas id="stakeChart"></canvas>
           </div>
         </div>
         <div class="chart-card">
-          <h3>Blocks pro Epoch (letzte 10)</h3>
+          <h3>Blocks pro Epoch (letzte 30)</h3>
           <div class="chart-wrapper">
             <canvas id="blocksChart"></canvas>
           </div>
@@ -454,6 +449,27 @@
         "zuletzt aktualisiert: " + dateStr + ", " + timeStr + " Uhr (statisch)";
     }
 
+    function updateRosStats(stats) {
+      const el = document.getElementById("ros-info");
+      if (!el || !stats) return;
+
+      const all = stats.avg_ros_all;
+      const last30 = stats.avg_ros_last_30;
+
+      const fmt = (v) =>
+        v == null
+          ? "n/a"
+          : (v * 100).toLocaleString("de-AT", {
+              maximumFractionDigits: 2
+            }) + " %";
+
+      el.textContent =
+        "Durchschnitts‑ROS: gesamt " +
+        fmt(all) +
+        " · letzte 30 Epochen " +
+        fmt(last30);
+    }
+
     function updateStatCards(poolInfo, delegators) {
       if (poolInfo) {
         if (poolInfo.live_stake) {
@@ -475,19 +491,22 @@
           if (elDel) elDel.textContent = poolInfo.live_delegators;
         }
       }
-      // delegators-Array aktuell leer; optional später nutzen
     }
 
     function buildCharts(history) {
       if (!history || !history.length) return;
 
-      const h = history[0]?.history || history;
+      const h = history;
       if (!h || !h.length) return;
 
-      const last = h.slice(-10);
+      const last = h; // Python hat bereits auf letzte 30 gekürzt
       const labels = last.map((e) => "Ep. " + e.epoch_no);
       const dataStake = last.map((e) => Number(e.active_stake || 0) / 1_000_000);
       const dataBlocks = last.map((e) => Number(e.blocks || 0));
+      const dataRos = last.map((e) => {
+        const v = e.epoch_ros;
+        return v == null ? null : Number(v) * 100;
+      });
 
       const ctxStake = document.getElementById("stakeChart")?.getContext("2d");
       const ctxBlocks = document
@@ -510,6 +529,17 @@
                 fill: true,
                 pointRadius: 2.5,
                 pointHoverRadius: 4
+              },
+              {
+                label: "ROS (%)",
+                data: dataRos,
+                borderColor: "#60a5fa",
+                backgroundColor: "rgba(96,165,250,0.12)",
+                borderWidth: 1.5,
+                tension: 0.35,
+                yAxisID: "y1",
+                pointRadius: 1.8,
+                pointHoverRadius: 3
               }
             ]
           },
@@ -522,8 +552,14 @@
                 grid: { display: false }
               },
               y: {
+                position: "left",
                 ticks: { color: "#9ca3af" },
                 grid: { color: "rgba(148,163,184,0.24)" }
+              },
+              y1: {
+                position: "right",
+                ticks: { color: "#bfdbfe" },
+                grid: { display: false }
               }
             },
             plugins: {
@@ -572,14 +608,16 @@
       try {
         const res = await fetch(POOL_JSON_URL, { cache: "no-cache" });
         if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json(); // { poolInfo, delegators, history, generated_at }
+        const data = await res.json();
 
         const poolInfo = data.poolInfo || {};
         const delegators = data.delegators || [];
         const history = data.history || [];
+        const stats = data.stats || {};
 
         updateStatCards(poolInfo, delegators);
         buildCharts(history);
+        updateRosStats(stats);
         setLastUpdatedFromGeneratedAt(data.generated_at);
       } catch (err) {
         console.error(err);
