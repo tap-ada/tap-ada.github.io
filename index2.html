@@ -436,7 +436,7 @@
     // Koios REST via corsproxy.io
     const KOIOS_BASE = "https://api.koios.rest/api/v1"; /* Koios API Basis-URL [web:13] */
     const POOL_ID = "pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z"; /* dein Bech32 Pool [page:1] */
-    const CORS_PROXY_PREFIX = "https://api.cors.lol/?url=";; /* Pattern laut Doku [web:29][web:31] */
+    const CORS_PROXY_PREFIX = "https://api.cors.lol/?url="; /* Pattern laut Doku [web:29][web:31] */
 
     async function fetchKoios(endpoint, body) {
       const targetUrl = `${KOIOS_BASE}/${endpoint}`;
