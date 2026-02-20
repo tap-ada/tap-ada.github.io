@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>TapTap Vienna — Cardano Stake Pool</title>
+  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Live Pool Stats über Koios via corsproxy.io.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --bg-body: #050816;
+      --bg-card: #0b1020;
+      --accent: #12b981;
+      --accent-soft: rgba(18, 185, 129, 0.15);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --radius-lg: 16px;
+      --radius-sm: 10px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --gap: 1.25rem;
+      --transition-fast: 0.18s ease-out;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Helvetica Neue", Arial, sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: radial-gradient(circle at top, #111827 0, #020617 50%, #000 100%);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    /* Layout Container */
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+
+    /* Header */
+
+    .site-header {
+      padding: 1.5rem 0 0.75rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      backdrop-filter: blur(18px);
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: linear-gradient(to bottom, rgba(15, 23, 42, 0.94), transparent);
+    }
+
+    .site-header h1 {
+      font-size: 1.25rem;
+      margin: 0 0 0.25rem;
+    }
+
+    .site-header p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Hero */
+
+    .hero {
+      padding: 2rem 0 1.5rem;
+    }
+
+    .hero-text h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-text p {
+      max-width: 32rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .meta-pill {
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent);
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 1.4rem;
+      border-radius: 999px;
+      background: radial-gradient(circle at top left, #22c55e 0, #0f766e 45%, #0891b2 100%);
+      color: #ecfdf5;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      box-shadow: 0 18px 40px rgba(16, 185, 129, 0.4);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        filter var(--transition-fast);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 26px 60px rgba(16, 185, 129, 0.55);
+    }
+
+    /* Dashboard */
+
+    .dashboard {
+      padding: 1rem 0 2.5rem;
+    }
+
+    .dashboard-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .dashboard-header h2 {
+      font-size: 1.2rem;
+      margin: 0;
+    }
+
+    .dashboard-tagline {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .refresh-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    /* Stat Cards grid */
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 60%);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1rem 0.9rem;
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: conic-gradient(
+        from 160deg,
+        rgba(56, 189, 248, 0.4),
+        transparent,
+        transparent,
+        rgba(16, 185, 129, 0.4),
+        transparent
+      );
+      opacity: 0;
+      transition: opacity 0.25s ease-out;
+      filter: blur(22px);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 26px 65px rgba(15, 23, 42, 0.95);
+      border-color: rgba(96, 165, 250, 0.65);
+    }
+
+    .stat-card:hover::before {
+      opacity: 0.8;
+    }
+
+    .stat-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-card-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .stat-card-tag {
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      color: var(--text-muted);
+    }
+
+    .stat-card-value {
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .stat-card-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    /* Chart area */
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--gap);
+    }
+
+    .chart-card {
+      background: #020617;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 1rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .chart-card h3 {
+      font-size: 1rem;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+    }
+
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 260px;
+    }
+
+    /* Footer */
+
+    .site-footer {
+      border-top: 1px solid rgba(148, 163, 184, 0.2);
+      padding: 1rem 0 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .site-footer a {
+      color: #93c5fd;
+      text-decoration: none;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive Breakpoints */
+
+    @media (min-width: 600px) {
+      .hero {
+        padding: 2.5rem 0 2rem;
+      }
+
+      .hero-text h2 {
+        font-size: 2rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 900px) {
+      .hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .chart-grid {
+        grid-template-columns: minmax(0, 1.5fr);
+      }
+    }
+
+    /* Mobile Safe Touch Targets */
+
+    @media (max-width: 480px) {
+      .site-header {
+        padding-top: 1rem;
+      }
+
+      .site-header h1 {
+        font-size: 1.1rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>TapTap Vienna — Cardano Stake Pool</h1>
+      <p>Maximum decentralization, minimum fees. Ticker: TAPSY · Fixed fee per epoch: 340 ADA.</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <h2>Stake your ADA mit TAPSY</h2>
+        <p>TapTap Vienna ist ein Cardano Stake Pool aus Wien mit dedizierter Bare‑Metal‑Hardware für maximale Zuverlässigkeit und Uptime.</p>
+        <div class="hero-meta">
+          <span class="meta-pill">Pool ID: d2f12c2f3094ed07…</span>
+          <span class="meta-pill">Standort: Wien, Österreich</span>
+          <span class="meta-pill">Fee: 340 ADA + Margin</span>
+        </div>
+        <a href="#pool-stats" class="btn-primary">Live Pool Stats ansehen</a>
+      </div>
+    </section>
+
+    <section id="pool-stats" class="dashboard">
+      <div class="dashboard-header">
+        <h2>Live Pool Stats</h2>
+        <span id="last-updated" class="dashboard-tagline">lädt…</span>
+      </div>
+      <p class="refresh-info">Daten via Koios REST API über corsproxy.io · Aktualisierung beim Laden der Seite.</p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Live Stake</div>
+            <div class="stat-card-tag">on-chain</div>
+          </div>
+          <div class="stat-card-value" id="live-stake">–</div>
+          <div class="stat-card-subtitle">ADA</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Active Stake</div>
+            <div class="stat-card-tag">aktuelle Epoch</div>
+          </div>
+          <div class="stat-card-value" id="active-stake">–</div>
+          <div class="stat-card-subtitle">ADA</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Delegators</div>
+            <div class="stat-card-tag">wallets</div>
+          </div>
+          <div class="stat-card-value" id="delegators">–</div>
+          <div class="stat-card-subtitle">Anzahl aktueller Delegatoren</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Blocks minted</div>
+            <div class="stat-card-tag">lifetime</div>
+          </div>
+          <div class="stat-card-value" id="blocks-minted">–</div>
+          <div class="stat-card-subtitle">Gesamtzahl aller erzeugten Blöcke</div>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Active Stake History (letzte 10 Epochs)</h3>
+          <div class="chart-wrapper">
+            <canvas id="stakeChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Blocks pro Epoch (letzte 10)</h3>
+          <div class="chart-wrapper">
+            <canvas id="blocksChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© TapTap Vienna — Cardano Stake Pool · Website: <a href="https://tap-ada.github.io">tap-ada.github.io</a></p>
+    </div>
+  </footer>
+
+  <!-- Chart.js von CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Koios REST via corsproxy.io
+    // corsproxy: https://corsproxy.io/?https://api.example.com/path [web:29][web:32][web:40]
+    const KOIOS_BASE = "https://api.koios.rest/api/v1"; // [web:13]
+    const POOL_ID = "d2f12c2f3094ed0784f048fe93a62d8b061525b356e043be084470d9"; // TapTap Pool ID [web:17]
+    const CORS_PROXY_PREFIX = "https://corsproxy.io/?";
+
+    async function fetchKoios(endpoint, body) {
+      const targetUrl = `${KOIOS_BASE}/${endpoint}`;
+      const proxiedUrl = CORS_PROXY_PREFIX + encodeURIComponent(targetUrl);
+
+      const res = await fetch(proxiedUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (!res.ok) {
+        throw new Error("Koios error " + res.status);
+      }
+      return res.json();
+    }
+
+    function formatAda(lovelace) {
+      const ada = Number(lovelace || 0) / 1_000_000;
+      return ada.toLocaleString("de-AT", { maximumFractionDigits: 0 });
+    }
+
+    function setLastUpdated() {
+      const el = document.getElementById("last-updated");
+      const now = new Date();
+      const time = now.toLocaleTimeString("de-AT", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+      el.textContent = "zuletzt aktualisiert: " + time + " Uhr";
+    }
+
+    function updateStatCards(info, delegators) {
+      if (info) {
+        if (info.live_stake) {
+          document.getElementById("live-stake").textContent = formatAda(info.live_stake);
+        }
+        if (info.active_stake) {
+          document.getElementById("active-stake").textContent = formatAda(info.active_stake);
+        }
+        if (info.blocks_lifetime !== undefined) {
+          document.getElementById("blocks-minted").textContent = info.blocks_lifetime;
+        }
+      }
+      if (Array.isArray(delegators)) {
+        document.getElementById("delegators").textContent = delegators.length;
+      }
+    }
+
+    function buildCharts(history) {
+      if (!history || !history.length) return;
+
+      const h = history[0].history || history;
+      const last = h.slice(-10);
+      const labels = last.map((e) => "Ep. " + e.epoch_no);
+      const dataStake = last.map((e) => Number(e.active_stake || 0) / 1_000_000);
+      const dataBlocks = last.map((e) => Number(e.blocks || 0));
+
+      const ctxStake = document.getElementById("stakeChart").getContext("2d");
+      const ctxBlocks = document.getElementById("blocksChart").getContext("2d");
+
+      new Chart(ctxStake, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Active Stake (ADA)",
+              data: dataStake,
+              borderColor: "#22c55e",
+              backgroundColor: "rgba(34,197,94,0.12)",
+              borderWidth: 2,
+              tension: 0.35,
+              fill: true,
+              pointRadius: 2.5,
+              pointHoverRadius: 4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              ticks: { color: "#9ca3af" },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: "#9ca3af" },
+              grid: { color: "rgba(148,163,184,0.24)" }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: "#e5e7eb" } }
+          }
+        }
+      });
+
+      new Chart(ctxBlocks, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Blocks",
+              data: dataBlocks,
+              backgroundColor: "rgba(59,130,246,0.7)"
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              ticks: { color: "#9ca3af" },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: "#9ca3af" },
+              grid: { color: "rgba(148,163,184,0.24)" }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: "#e5e7eb" } }
+          }
+        }
+      });
+    }
+
+    async function loadPoolStats() {
+      const section = document.getElementById("pool-stats");
+      try {
+        const [poolInfo, delegators, history] = await Promise.all([
+          fetchKoios("pool_info", { _pool_bech32: [POOL_ID] }),
+          fetchKoios("pool_delegators", { _pool_bech32: [POOL_ID] }),
+          fetchKoios("pool_history", { _pool_bech32: [POOL_ID], _epoch_no: null })
+        ]);
+
+        updateStatCards(poolInfo[0], delegators);
+        buildCharts(history);
+        setLastUpdated();
+      } catch (err) {
+        console.error(err);
+        section.insertAdjacentHTML(
+          "beforeend",
+          '<p style="color:#f97373;margin-top:0.75rem;">Konnte Live‑Daten nicht laden. Bitte später erneut versuchen.</p>'
+        );
+        document.getElementById("last-updated").textContent = "Fehler beim Laden der Daten";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadPoolStats);
+  </script>
+</body>
+</html>
