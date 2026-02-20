@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>TapTap Vienna — Cardano Stake Pool</title>
-  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Live Pool Stats über Koios via corsproxy.io.">
+  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Statische Pool-Stats via GitHub Actions.">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
@@ -323,8 +323,6 @@
       }
     }
 
-    /* Mobile Safe Touch Targets */
-
     @media (max-width: 480px) {
       .site-header {
         padding-top: 1rem;
@@ -356,18 +354,18 @@
         <div class="hero-meta">
           <span class="meta-pill">Pool ID: pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z</span>
           <span class="meta-pill">Standort: Wien, Österreich</span>
-          <span class="meta-pill">Fee: 340 ADA + Margin</span>
+          <span class="meta-pill">Fee: 340 ADA + Margin 1%</span>
         </div>
-        <a href="#pool-stats" class="btn-primary">Live Pool Stats ansehen</a>
+        <a href="#pool-stats" class="btn-primary">Pool‑Stats ansehen</a>
       </div>
     </section>
 
     <section id="pool-stats" class="dashboard">
       <div class="dashboard-header">
-        <h2>Live Pool Stats</h2>
+        <h2>Pool‑Stats (statisch)</h2>
         <span id="last-updated" class="dashboard-tagline">lädt…</span>
       </div>
-      <p class="refresh-info">Daten via Koios REST API über corsproxy.io · Aktualisierung beim Laden der Seite.</p>
+      <p class="refresh-info">Daten werden periodisch via GitHub Actions aus Koios abgerufen und als JSON bereitgestellt.</p>
 
       <div class="stats-grid">
         <div class="stat-card">
@@ -394,7 +392,7 @@
             <div class="stat-card-tag">wallets</div>
           </div>
           <div class="stat-card-value" id="delegators">–</div>
-          <div class="stat-card-subtitle">Anzahl aktueller Delegatoren</div>
+          <div class="stat-card-subtitle">aktuelle Live‑Delegatoren</div>
         </div>
 
         <div class="stat-card">
@@ -430,164 +428,169 @@
     </div>
   </footer>
 
-  <!-- Chart.js von CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Koios REST via corsproxy.io
-    const KOIOS_BASE = "https://api.koios.rest/api/v1"; /* Koios API Basis-URL [web:13] */
-    const POOL_ID = "pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z"; /* dein Bech32 Pool [page:1] */
-    const CORS_PROXY_PREFIX = "https://api.cors.lol/?url="; /* Pattern laut Doku [web:29][web:31] */
-
-    async function fetchKoios(endpoint, body) {
-      const targetUrl = `${KOIOS_BASE}/${endpoint}`;
-      const proxiedUrl = CORS_PROXY_PREFIX + encodeURIComponent(targetUrl);
-
-      const res = await fetch(proxiedUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
-
-      if (!res.ok) {
-        throw new Error("Koios error " + res.status);
-      }
-      return res.json();
-    }
+    const POOL_JSON_URL = "/data/pool.json";
 
     function formatAda(lovelace) {
       const ada = Number(lovelace || 0) / 1_000_000;
       return ada.toLocaleString("de-AT", { maximumFractionDigits: 0 });
     }
 
-    function setLastUpdated() {
+    function setLastUpdatedFromGeneratedAt(iso) {
       const el = document.getElementById("last-updated");
-      const now = new Date();
-      const time = now.toLocaleTimeString("de-AT", {
+      if (!el) return;
+      if (!iso) {
+        el.textContent = "Zeitpunkt der letzten Aktualisierung unbekannt";
+        return;
+      }
+      const d = new Date(iso);
+      const dateStr = d.toLocaleDateString("de-AT");
+      const timeStr = d.toLocaleTimeString("de-AT", {
         hour: "2-digit",
         minute: "2-digit"
       });
-      el.textContent = "zuletzt aktualisiert: " + time + " Uhr";
+      el.textContent =
+        "zuletzt aktualisiert: " + dateStr + ", " + timeStr + " Uhr (statisch)";
     }
 
-    function updateStatCards(info, delegators) {
-      if (info) {
-        if (info.live_stake) {
-          document.getElementById("live-stake").textContent = formatAda(info.live_stake);
+    function updateStatCards(poolInfo, delegators) {
+      if (poolInfo) {
+        if (poolInfo.live_stake) {
+          document.getElementById("live-stake").textContent = formatAda(
+            poolInfo.live_stake
+          );
         }
-        if (info.active_stake) {
-          document.getElementById("active-stake").textContent = formatAda(info.active_stake);
+        if (poolInfo.active_stake) {
+          document.getElementById("active-stake").textContent = formatAda(
+            poolInfo.active_stake
+          );
         }
-        if (info.blocks_lifetime !== undefined) {
-          document.getElementById("blocks-minted").textContent = info.blocks_lifetime;
+        if (poolInfo.block_count !== undefined) {
+          const elBlocks = document.getElementById("blocks-minted");
+          if (elBlocks) elBlocks.textContent = poolInfo.block_count;
+        }
+        if (poolInfo.live_delegators !== undefined) {
+          const elDel = document.getElementById("delegators");
+          if (elDel) elDel.textContent = poolInfo.live_delegators;
         }
       }
-      if (Array.isArray(delegators)) {
-        document.getElementById("delegators").textContent = delegators.length;
-      }
+      // delegators-Array aktuell leer; optional später nutzen
     }
 
     function buildCharts(history) {
       if (!history || !history.length) return;
 
-      const h = history[0].history || history;
+      const h = history[0]?.history || history;
+      if (!h || !h.length) return;
+
       const last = h.slice(-10);
       const labels = last.map((e) => "Ep. " + e.epoch_no);
       const dataStake = last.map((e) => Number(e.active_stake || 0) / 1_000_000);
       const dataBlocks = last.map((e) => Number(e.blocks || 0));
 
-      const ctxStake = document.getElementById("stakeChart").getContext("2d");
-      const ctxBlocks = document.getElementById("blocksChart").getContext("2d");
+      const ctxStake = document.getElementById("stakeChart")?.getContext("2d");
+      const ctxBlocks = document
+        .getElementById("blocksChart")
+        ?.getContext("2d");
 
-      new Chart(ctxStake, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Active Stake (ADA)",
-              data: dataStake,
-              borderColor: "#22c55e",
-              backgroundColor: "rgba(34,197,94,0.12)",
-              borderWidth: 2,
-              tension: 0.35,
-              fill: true,
-              pointRadius: 2.5,
-              pointHoverRadius: 4
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: { color: "#9ca3af" },
-              grid: { display: false }
-            },
-            y: {
-              ticks: { color: "#9ca3af" },
-              grid: { color: "rgba(148,163,184,0.24)" }
-            }
+      if (ctxStake) {
+        new Chart(ctxStake, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Active Stake (ADA)",
+                data: dataStake,
+                borderColor: "#22c55e",
+                backgroundColor: "rgba(34,197,94,0.12)",
+                borderWidth: 2,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 2.5,
+                pointHoverRadius: 4
+              }
+            ]
           },
-          plugins: {
-            legend: { labels: { color: "#e5e7eb" } }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                ticks: { color: "#9ca3af" },
+                grid: { display: false }
+              },
+              y: {
+                ticks: { color: "#9ca3af" },
+                grid: { color: "rgba(148,163,184,0.24)" }
+              }
+            },
+            plugins: {
+              legend: { labels: { color: "#e5e7eb" } }
+            }
           }
-        }
-      });
+        });
+      }
 
-      new Chart(ctxBlocks, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Blocks",
-              data: dataBlocks,
-              backgroundColor: "rgba(59,130,246,0.7)"
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: {
-              ticks: { color: "#9ca3af" },
-              grid: { display: false }
-            },
-            y: {
-              ticks: { color: "#9ca3af" },
-              grid: { color: "rgba(148,163,184,0.24)" }
-            }
+      if (ctxBlocks) {
+        new Chart(ctxBlocks, {
+          type: "bar",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Blocks",
+                data: dataBlocks,
+                backgroundColor: "rgba(59,130,246,0.7)"
+              }
+            ]
           },
-          plugins: {
-            legend: { labels: { color: "#e5e7eb" } }
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                ticks: { color: "#9ca3af" },
+                grid: { display: false }
+              },
+              y: {
+                ticks: { color: "#9ca3af" },
+                grid: { color: "rgba(148,163,184,0.24)" }
+              }
+            },
+            plugins: {
+              legend: { labels: { color: "#e5e7eb" } }
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     async function loadPoolStats() {
       const section = document.getElementById("pool-stats");
       try {
-        const [poolInfo, delegators, history] = await Promise.all([
-          fetchKoios("pool_info", { _pool_bech32: [POOL_ID] }),
-          fetchKoios("pool_delegators", { _pool_bech32: [POOL_ID] }),
-          fetchKoios("pool_history", { _pool_bech32: [POOL_ID], _epoch_no: null })
-        ]);
+        const res = await fetch(POOL_JSON_URL, { cache: "no-cache" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json(); // { poolInfo, delegators, history, generated_at }
 
-        updateStatCards(poolInfo[0], delegators);
+        const poolInfo = data.poolInfo || {};
+        const delegators = data.delegators || [];
+        const history = data.history || [];
+
+        updateStatCards(poolInfo, delegators);
         buildCharts(history);
-        setLastUpdated();
+        setLastUpdatedFromGeneratedAt(data.generated_at);
       } catch (err) {
         console.error(err);
-        section.insertAdjacentHTML(
-          "beforeend",
-          '<p style="color:#f97373;margin-top:0.75rem;">Konnte Live‑Daten nicht laden. Bitte später erneut versuchen.</p>'
-        );
-        document.getElementById("last-updated").textContent = "Fehler beim Laden der Daten";
+        if (section) {
+          section.insertAdjacentHTML(
+            "beforeend",
+            '<p style="color:#f97373;margin-top:0.75rem;">Konnte statische Pool-Daten nicht laden. Bitte später erneut versuchen.</p>'
+          );
+        }
+        const lbl = document.getElementById("last-updated");
+        if (lbl) lbl.textContent = "Fehler beim Laden der Daten";
       }
     }
 
