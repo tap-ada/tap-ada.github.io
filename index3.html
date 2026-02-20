@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>TapTap Vienna — Cardano Stake Pool</title>
+  <meta name="description" content="TapTap Vienna — Cardano Stake Pool aus Wien. Maximum decentralization, minimum fees. Ticker: TAPSY. Statische Pool-Stats und ROS via GitHub Actions.">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-body: #050816;
+      --bg-card: #0b1020;
+      --accent: #12b981;
+      --accent-soft: rgba(18, 185, 129, 0.15);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --radius-lg: 16px;
+      --radius-sm: 10px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --gap: 1.25rem;
+      --transition-fast: 0.18s ease-out;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;}
+    html,body{margin:0;padding:0;}
+    body{font-family:var(--font-sans);background:radial-gradient(circle at top,#111827 0,#020617 50%,#000 100%);color:var(--text-main);line-height:1.5;}
+    a{color:inherit;}
+    .container{width:100%;max-width:1120px;margin:0 auto;padding:0 1rem;}
+    .site-header{padding:1.5rem 0 .75rem;border-bottom:1px solid rgba(148,163,184,.14);backdrop-filter:blur(18px);position:sticky;top:0;z-index:40;background:linear-gradient(to bottom,rgba(15,23,42,.94),transparent);}
+    .site-header h1{font-size:1.25rem;margin:0 0 .25rem;}
+    .site-header p{margin:0;font-size:.9rem;color:var(--text-muted);}
+    .hero{padding:2rem 0 1.5rem;}
+    .hero-text h2{font-size:1.6rem;margin-bottom:.5rem;}
+    .hero-text p{max-width:32rem;color:var(--text-muted);margin-bottom:1rem;}
+    .hero-meta{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem;font-size:.9rem;color:var(--text-muted);}
+    .meta-pill{padding:.35rem .7rem;border-radius:999px;border:1px solid rgba(148,163,184,.32);background:radial-gradient(circle at top left,rgba(34,197,94,.12),transparent);}
+    .btn-primary{display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.4rem;border-radius:999px;background:radial-gradient(circle at top left,#22c55e 0,#0f766e 45%,#0891b2 100%);color:#ecfdf5;font-weight:600;font-size:.95rem;text-decoration:none;box-shadow:0 18px 40px rgba(16,185,129,.4);transition:transform var(--transition-fast),box-shadow var(--transition-fast),filter var(--transition-fast);}
+    .btn-primary:hover{transform:translateY(-1px);filter:brightness(1.05);box-shadow:0 26px 60px rgba(16,185,129,.55);}
+    .dashboard{padding:1rem 0 2.5rem;}
+    .dashboard-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:.5rem;margin-bottom:.75rem;}
+    .dashboard-header h2{font-size:1.2rem;margin:0;}
+    .dashboard-tagline{font-size:.85rem;color:var(--text-muted);}
+    .refresh-info{font-size:.8rem;color:var(--text-muted);margin-bottom:.25rem;}
+    .ros-info{font-size:.8rem;color:#86efac;margin-bottom:.75rem;min-height:1.2em;}
+    .stats-grid{display:grid;grid-template-columns:1fr;gap:var(--gap);margin-bottom:1.5rem;}
+    .stat-card{background:radial-gradient(circle at top left,#111827 0,#020617 60%);border-radius:var(--radius-lg);padding:1rem 1rem .9rem;box-shadow:var(--shadow-soft);border:1px solid rgba(148,163,184,.22);position:relative;overflow:hidden;transition:transform var(--transition-fast),box-shadow var(--transition-fast),border-color var(--transition-fast);}
+    .stat-card::before{content:"";position:absolute;inset:-40%;background:conic-gradient(from 160deg,rgba(56,189,248,.4),transparent,transparent,rgba(16,185,129,.4),transparent);opacity:0;transition:opacity .25s ease-out;filter:blur(22px);}
+    .stat-card:hover{transform:translateY(-2px);box-shadow:0 26px 65px rgba(15,23,42,.95);border-color:rgba(96,165,250,.65);}
+    .stat-card:hover::before{opacity:.8;}
+    .stat-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;}
+    .stat-card-title{font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);}
+    .stat-card-tag{font-size:.7rem;padding:.15rem .45rem;border-radius:999px;border:1px solid rgba(148,163,184,.32);color:var(--text-muted);}
+    .stat-card-value{font-size:1.3rem;font-weight:600;}
+    .stat-card-subtitle{font-size:.78rem;color:var(--text-muted);margin-top:.1rem;}
+    .chart-grid{display:grid;grid-template-columns:1fr;gap:var(--gap);}
+    .chart-card{background:#020617;border-radius:var(--radius-lg);border:1px solid rgba(148,163,184,.22);padding:1rem;box-shadow:var(--shadow-soft);}
+    .chart-card h3{font-size:1rem;margin:0 0 .75rem 0;}
+    .chart-wrapper{position:relative;width:100%;height:260px;}
+    .site-footer{border-top:1px solid rgba(148,163,184,.2);padding:1rem 0 1.5rem;color:var(--text-muted);font-size:.85rem;}
+    .site-footer a{color:#93c5fd;text-decoration:none;}
+    .site-footer a:hover{text-decoration:underline;}
+    @media (min-width:600px){.hero{padding:2.5rem 0 2rem;}.hero-text h2{font-size:2rem;}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+    @media (min-width:900px){.hero{display:flex;align-items:center;justify-content:space-between;}.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr));}.chart-grid{grid-template-columns:minmax(0,1.5fr);}}
+    @media (max-width:480px){.site-header{padding-top:1rem;}.site-header h1{font-size:1.1rem;}.btn-primary{width:100%;}}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <h1>TapTap Vienna — Cardano Stake Pool</h1>
+      <p>Maximum decentralization, minimum fees. Ticker: TAPSY · Fixed fee per epoch: 340 ADA.</p>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <h2>Stake your ADA mit TAPSY</h2>
+        <p>TapTap Vienna ist ein Cardano Stake Pool aus Wien mit dedizierter Bare-Metal-Hardware für maximale Zuverlässigkeit und Uptime.</p>
+        <div class="hero-meta">
+          <span class="meta-pill">Pool ID: pool16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z</span>
+          <span class="meta-pill">Standort: Wien, Österreich</span>
+          <span class="meta-pill">Fee: 340 ADA + Margin 1%</span>
+          <a href="https://pooltool.io/pool/16tcjctesjnks0p8sfrlf8f3d3vrp2fdn2msy80sgg3cdjtayu3z" class="meta-pill" target="_blank">PoolTool</a>
+        </div>
+        <a href="#pool-stats" class="btn-primary">Pool-Stats ansehen</a>
+      </div>
+    </section>
+    <section id="pool-stats" class="dashboard">
+      <div class="dashboard-header">
+        <h2>Pool-Stats</h2>
+        <span id="last-updated" class="dashboard-tagline">lädt…</span>
+      </div>
+      <p class="refresh-info">Daten via GitHub Actions aus Koios API (stündlich aktualisiert).</p>
+      <p class="ros-info" id="ros-info">lädt…</p>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Live Stake</div>
+            <div class="stat-card-tag">on-chain</div>
+          </div>
+          <div class="stat-card-value" id="live-stake">–</div>
+          <div class="stat-card-subtitle">ADA</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Active Stake</div>
+            <div class="stat-card-tag">aktuelle Epoch</div>
+          </div>
+          <div class="stat-card-value" id="active-stake">–</div>
+          <div class="stat-card-subtitle">ADA</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Delegators</div>
+            <div class="stat-card-tag">wallets</div>
+          </div>
+          <div class="stat-card-value" id="delegators">–</div>
+          <div class="stat-card-subtitle">Live-Delegatoren</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div class="stat-card-title">Blocks minted</div>
+            <div class="stat-card-tag">lifetime</div>
+          </div>
+          <div class="stat-card-value" id="blocks-minted">–</div>
+          <div class="stat-card-subtitle">Gesamtzahl Blöcke</div>
+        </div>
+      </div>
+      <div class="chart-grid">
+        <div class="chart-card">
+          <h3>Active Stake & ROS (letzte 30 Epochen)</h3>
+          <div class="chart-wrapper"><canvas id="stakeChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Blocks pro Epoche (letzte 30)</h3>
+          <div class="chart-wrapper"><canvas id="blocksChart"></canvas></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container">
+      <p>© TapTap Vienna — Cardano Stake Pool · <a href="https://tap-ada.github.io">tap-ada.github.io</a></p>
+    </div>
+  </footer>
+  <script>
+    const POOL_JSON_URL="data/pool.json";let stakeChart,blocksChart;function formatAda(lovelace){const ada=Number(lovelace||0)/1e6;return ada.toLocaleString("de-AT",{maximumFractionDigits:0});}function setLastUpdated(iso){const el=document.getElementById("last-updated");if(!el)return;if(!iso){el.textContent="Zeitpunkt unbekannt";return;}const d=new Date(iso);el.textContent=`Aktualisiert: ${d.toLocaleDateString("de-AT")} ${d.toLocaleTimeString("de-AT",{hour:"2-digit",minute:"2-digit"})}`;}function updateRosStats(stats){const el=document.getElementById("ros-info");if(!el||!stats)return;const fmt=v=>v==null?"n/a":(v*100).toLocaleString("de-AT",{maximumFractionDigits:2})+"%";el.textContent=`ROS: Gesamt ${fmt(stats.avg_ros_all)} | Letzte 30 ${fmt(stats.avg_ros_last_30)} (${stats.epochs_last_30_count||0} Epochen)`;}function updateStats(poolInfo){if(poolInfo){document.getElementById("live-stake").textContent=formatAda(poolInfo.live_stake);document.getElementById("active-stake").textContent=formatAda(poolInfo.active_stake);document.getElementById("delegators").textContent=poolInfo.live_delegators?.toLocaleString()||"–";document.getElementById("blocks-minted").textContent=poolInfo.block_count?.toLocaleString()||"–";}}function createStakeChart(ctx,history){const labels=history.map(h=>`Ep. ${h.epoch_no}`);const stakeData=history.map(h=>Number(h.active_stake||0)/1e6);const rosData=history.map(h=>(h.epoch_ros||0)*100);new Chart(ctx,{type:"line",data:{labels,datasets:[{label:"Active Stake (M ADA)",data:stakeData,borderColor:"#22c55e",backgroundColor:"rgba(34,197,94,0.12)",tension:.4,fill:!0,pointRadius:3},{label:"ROS (%)",data:rosData,borderColor:"#60a5fa",backgroundColor:"rgba(96,165,250,0.12)",tension:.4,yAxisID:"y1",pointRadius:3}]},options:{responsive:!0,scales:{y:{beginAtZero:!0},y1:{type:"linear",position:"right",beginAtZero:!0,grid:{drawOnChartArea:!1}}}}});}function createBlocksChart(ctx,history){const labels=history.map(h=>`Ep. ${h.epoch_no}`);const blocksData=history.map(h=>h.blocks||0);new Chart(ctx,{type:"bar",data:{labels,datasets:[{label:"Blocks",data:blocksData,backgroundColor:"#0891b2"}]},options:{responsive:!0,scales:{y:{beginAtZero:!0}}}});}async function loadPoolData(){try{const resp=await fetch(POOL_JSON_URL);if(!resp.ok)throw new Error("JSON nicht gefunden");const data=await resp.json();setLastUpdated(data.generated_at);updateStats(data.poolInfo);updateRosStats(data.stats);const stakeCtx=document.getElementById("stakeChart").getContext("2d");const blocksCtx=document.getElementById("blocksChart").getContext("2d");createStakeChart(stakeCtx,data.history);createBlocksChart(blocksCtx,data.history);}catch(e){console.error(e);document.getElementById("ros-info").textContent="Fehler: JSON nicht ladbar (prüfe data/pool.json)";}}loadPoolData();setInterval(loadPoolData,3e5);
+  </script>
+</body>
+</html>
